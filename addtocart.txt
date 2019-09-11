@@ -1,0 +1,150 @@
+package com.cg.customer.bean;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name="cartlist")
+public class CartList {
+	@Column(name = "prod_Id")
+	private Long prodId;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "cartlist_id")
+	private long cardId;
+	private String prod_Name;
+	private Double prod_Price;
+	private Long prod_Quantity;
+	private Integer prod_Discount;
+	private String prod_Category;
+	private String prod_Desc;
+	private String prod_Image;
+	public Long getProdId() {
+		return prodId;
+	}
+	public void setProdId(Long prodId) {
+		this.prodId = prodId;
+	}
+	public long getCardId() {
+		return cardId;
+	}
+	public void setCardId(long cardId) {
+		this.cardId = cardId;
+	}
+	public String getProd_Name() {
+		return prod_Name;
+	}
+	public void setProd_Name(String prod_Name) {
+		this.prod_Name = prod_Name;
+	}
+	public Double getProd_Price() {
+		return prod_Price;
+	}
+	public void setProd_Price(Double prod_Price) {
+		this.prod_Price = prod_Price;
+	}
+	public Long getProd_Quantity() {
+		return prod_Quantity;
+	}
+	public void setProd_Quantity(Long prod_Quantity) {
+		this.prod_Quantity = prod_Quantity;
+	}
+	public Integer getProd_Discount() {
+		return prod_Discount;
+	}
+	public void setProd_Discount(Integer prod_Discount) {
+		this.prod_Discount = prod_Discount;
+	}
+	public String getProd_Category() {
+		return prod_Category;
+	}
+	public void setProd_Category(String prod_Category) {
+		this.prod_Category = prod_Category;
+	}
+	public String getProd_Desc() {
+		return prod_Desc;
+	}
+	public void setProd_Desc(String prod_Desc) {
+		this.prod_Desc = prod_Desc;
+	}
+	public String getProd_Image() {
+		return prod_Image;
+	}
+	public void setProd_Image(String prod_Image) {
+		this.prod_Image = prod_Image;
+	}
+	
+	
+}
+
+
+
+	@PostMapping(value = "/cartlist/{prod_Id}")
+	public ResponseEntity<CartList> addToCartList(@PathVariable("prod_Id") Long prod_Id) {
+		System.out.println(prod_Id);
+		CartList result = service.addToCart(prod_Id);
+		return new ResponseEntity<CartList>(result, HttpStatus.OK);
+	}
+
+	@GetMapping(value = "/cartlist/")
+	public ResponseEntity<List<CartList>> showCartList() {
+		
+		List<CartList> list=new ArrayList<>();
+		list = service.displayCartList();
+		return ResponseEntity.ok(list);
+
+	}
+
+
+
+package com.cg.customer.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import com.cg.customer.bean.CartList;
+
+
+@Repository
+public interface CartListRepository extends JpaRepository<CartList,Long>{
+
+	//@Query("from CartList list where list.prod_Id = :prod_Id")
+	//CartList findByListId(@Param("prod_Id") Long prod_Id);
+}
+
+
+public CartList addToCart(Long prod_Id);
+	public List<CartList> displayCartList();
+
+
+
+@Override
+	public CartList addToCart(Long prod_Id) {
+		long quantity=1;
+		CartList entity = new CartList();
+		
+		Product wlist = productrepo.findProduct(prod_Id);
+		
+		entity.setProdId(wlist.getProd_Id());
+		entity.setProd_Category(wlist.getProd_Category());
+		entity.setProd_Desc(wlist.getProd_Desc());
+		entity.setProd_Discount((int) wlist.getProd_Discount());
+		entity.setProd_Image(wlist.getProd_Image());
+		entity.setProd_Price(wlist.getProd_Price());
+		entity.setProd_Quantity((quantity));
+		entity.setProd_Name(wlist.getProd_Name());
+		return cartRepo.saveAndFlush(entity);
+	}
+
+	@Override
+	public List<CartList> displayCartList() {
+		List<CartList> list = new ArrayList();
+		list = cartRepo.findAll();
+		return list;
+	}
